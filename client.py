@@ -43,9 +43,9 @@ def main():
                 value = parts[2] if len(parts)>2 else ""
 
                 cmd = {
-                    "PUT": f"PUT {key} {value}",
-                    "GET": f"GET {key}",
-                    "READ": f"READ {key}"
+                    "PUT": f"P {key} {value}",
+                    "GET": f"G {key}",
+                    "READ": f"R {key}"
                 }.get(op, "")
                 
                 if not cmd:
