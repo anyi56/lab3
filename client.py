@@ -23,6 +23,7 @@ def main():
     try:
         with open(file) as f:
             requests = [line.strip() for line in f if line.strip()]
+            print(f"Loaded {len(requests)} requests")
     except Exception as e:
         print(f"File error: {str(e)}")
         return

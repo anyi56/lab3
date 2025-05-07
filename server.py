@@ -43,34 +43,36 @@ def handle_client(client_socket,addr):
         states['total_clients'] += 1
     print(f"[NEW CONNECTION] {addr} connected.")
     try:
-        header = client_socket.recv(3)
-        if len(header) != 3:
-            return
-        msg_len = int(header.decode('utf-8'))
-        message = b''
-        while len(message) < msg_len:
-            chunk = client_socket.recv(msg_len - len(message))
-            if not chunk:
-                break
-            message += chunk
-        message = message.decode('utf-8')
-        parts = message.split()
-        operation = parts[0]
-        k = parts[1]
-        v = parts[2] if len(parts) > 2 else ""
-        with lock:
-            states['total_operations'] += 1
-            if operation == "PUT":
-               response = put(k,v)
-            elif operation == "GET":
-                response = get(k)
-            elif operation == "READ":
-                response = read(k)
-            else:
-                print("ERR Invalid operation.")
-                states['errors'] += 1
-        formatted_response = f"{len(response):03d}{response}"
-        client_socket.send(formatted_response.encode('utf-8'))
+        while True:
+            header = client_socket.recv(3)
+            if len(header) != 3:
+                return
+            msg_len = int(header.decode('utf-8'))
+            message = b''
+            while len(message) < msg_len:
+                chunk = client_socket.recv(msg_len - len(message))
+                if not chunk:
+                    break
+                message += chunk
+            decode_message = message.decode('utf-8')
+            print(f"Received from {addr}: {decode_message}")
+            parts = decode_message.split(maxsplit=2)
+            operation = parts[0]
+            k = parts[1]
+            v = parts[2] if len(parts) > 2 else ""
+            with lock:
+                states['total_operations'] += 1
+                if operation == "PUT":
+                    response = put(k,v)
+                elif operation == "GET":
+                    response = get(k)
+                elif operation == "READ":
+                    response = read(k)
+                else:
+                    print("ERR Invalid operation.")
+                    states['errors'] += 1
+            formatted_response = f"{len(response):03d}{response}"
+            client_socket.send(formatted_response.encode('utf-8'))
     finally:
         client_socket.close()
 def states_monitor():
