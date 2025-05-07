@@ -69,9 +69,9 @@ def handle_client(client_socket,addr):
                 elif operation == "READ":
                     response = read(k)
                 else:
-                    print("ERR Invalid operation.")
+                    response = "ERR Invalid operation."
                     states['errors'] += 1
-            formatted_response = f"{len(response):03d}{response}"
+            formatted_response = f"{len(str(response)):03d}{response}"
             client_socket.send(formatted_response.encode('utf-8'))
     finally:
         client_socket.close()
